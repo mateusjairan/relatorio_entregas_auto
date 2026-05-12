@@ -269,12 +269,12 @@
       dataCel.value = paraValorData(item.data);
       dataCel.numFmt = "mm-dd-yy";
 
-      row.getCell(2).value = item.supervisor;
-      row.getCell(3).value = item.encarregado;
-      row.getCell(4).value = item.hub;
-      row.getCell(5).value = item.entregador;
-      row.getCell(6).value = item.regiao;
-      row.getCell(7).value = item.turno;
+      row.getCell(2).value = (item.supervisor || "").toUpperCase();
+      row.getCell(3).value = (item.encarregado || "").toUpperCase();
+      row.getCell(4).value = (item.hub || "").toUpperCase();
+      row.getCell(5).value = (item.entregador || "").toUpperCase();
+      row.getCell(6).value = (item.regiao || "").toUpperCase();
+      row.getCell(7).value = (item.turno || "").toUpperCase();
 
       var hp = (item.horario || "00:00").split(":");
       var horaCel = row.getCell(8);
