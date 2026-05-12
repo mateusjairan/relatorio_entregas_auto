@@ -277,9 +277,9 @@
       row.getCell(7).value = (item.turno || "").toUpperCase();
 
       var hp = (item.horario || "00:00").split(":");
-      var horaCel = row.getCell(8);
-      horaCel.value = new Date(1970, 0, 1, parseInt(hp[0], 10) || 0, parseInt(hp[1], 10) || 0);
-      horaCel.numFmt = "h:mm";
+      var h = parseInt(hp[0], 10) || 0;
+      var m = parseInt(hp[1], 10) || 0;
+      row.getCell(8).value = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
 
       row.getCell(9).value = item.carrosOfertados;
       row.getCell(10).value = item.carrosRetirados;
@@ -287,9 +287,10 @@
       row.getCell(12).value = item.noShow;
 
       for (var col = 1; col <= 12; col++) { row.getCell(col).style = estiloDado(); }
+      row.getCell(1).numFmt = "mm-dd-yy";
     }
 
-    var filename = "Relatório Reporte Base " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".xlsx";
+    var filename = "RELATÓRIO REPORTE BASE " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".XLSX";
 
     wb.xlsx.writeBuffer().then(function (buffer) {
       var blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
