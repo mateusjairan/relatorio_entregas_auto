@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Relatório Operacional - Gerador Automático</title>
+        <link rel="stylesheet" href="style.css" />
+        <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <header class="relatorio-header">
+                <h1>Relatório Operacional</h1>
+                <p>Entregas</p>
+            </header>
+
+            <section class="card form-card">
+                <h2>Cadastro de Entregador</h2>
+                <form id="formEntrega" autocomplete="off">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="data">DATA *</label>
+                            <input type="date" id="data" required />
+                        </div>
+                        <div class="field">
+                            <label for="supervisor"
+                                >SUPERVISOR/COORDENADOR *</label
+                            >
+                            <input
+                                type="text"
+                                id="supervisor"
+                                placeholder="Ex: Cinthya"
+                                required
+                            />
+                        </div>
+                        <div class="field">
+                            <label for="encarregado">ENCARREGADO *</label>
+                            <input
+                                type="text"
+                                id="encarregado"
+                                placeholder="Ex: Mateus Reis"
+                                required
+                            />
+                        </div>
+                        <div class="field">
+                            <label for="hub">HUB *</label>
+                            <input
+                                type="text"
+                                id="hub"
+                                value="LMG-21 Muriaé"
+                                required
+                            />
+                        </div>
+                        <div class="field">
+                            <label for="entregador">ENTREGADOR *</label>
+                            <input
+                                type="text"
+                                id="entregador"
+                                placeholder="Nome do entregador"
+                                required
+                            />
+                        </div>
+                        <div class="field">
+                            <label for="regiao">REGIÃO/ BAIRRO *</label>
+                            <input
+                                type="text"
+                                id="regiao"
+                                placeholder="Ex: Pedra Dourada"
+                                required
+                            />
+                        </div>
+                        <div class="field">
+                            <label for="turno">AM/PM *</label>
+                            <select id="turno" required>
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="horario">HORÁRIO INCIADO *</label>
+                            <input type="time" id="horario" required />
+                        </div>
+                        <div class="field">
+                            <label for="carrosOfertados"
+                                >CARROS OFERTADOS</label
+                            >
+                            <input
+                                type="number"
+                                id="carrosOfertados"
+                                min="0"
+                                value="0"
+                            />
+                        </div>
+                        <div class="field">
+                            <label for="carrosRetirados"
+                                >CARROS RETIRADOS</label
+                            >
+                            <input
+                                type="number"
+                                id="carrosRetirados"
+                                min="0"
+                                value="0"
+                            />
+                        </div>
+                        <div class="field">
+                            <label for="pctExpedidos">PCT EXPEDIDOS</label>
+                            <input
+                                type="number"
+                                id="pctExpedidos"
+                                min="0"
+                                value="0"
+                            />
+                        </div>
+                        <div class="field">
+                            <label for="noShow">NO SHOW</label>
+                            <input
+                                type="number"
+                                id="noShow"
+                                min="0"
+                                value="0"
+                            />
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            Adicionar
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            Limpar Campos
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="card">
+                <div class="section-header">
+                    <h2>Registros</h2>
+                    <div><span id="contagem">0</span> registro(s)</div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="tabelaRelatorio">
+                        <thead>
+                            <tr>
+                                <th>DATA</th>
+                                <th>SUPERVISOR/COORDENADOR</th>
+                                <th>ENCARREGADO</th>
+                                <th>HUB</th>
+                                <th>ENTREGADOR</th>
+                                <th>REGIÃO/ BAIRRO</th>
+                                <th>AM/PM</th>
+                                <th>HORÁRIO INCIADO</th>
+                                <th>CARROS OFERTADOS</th>
+                                <th>CARROS RETIRADOS</th>
+                                <th>PCT EXPEDIDOS</th>
+                                <th>NO SHOW</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyRelatorio"></tbody>
+                    </table>
+                </div>
+
+                <div class="table-actions">
+                    <button class="btn btn-danger" id="btnLimpar">
+                        Limpar Todos os Dados
+                    </button>
+                </div>
+            </section>
+
+            <section class="card" id="resumoCard">
+                <h2>Resumo</h2>
+
+                <div class="totais-grid" id="totaisGerais">
+                    <div class="total-item">
+                        <span class="total-label">CARROS OFERTADOS</span>
+                        <span class="total-value" id="totalOfertados">0</span>
+                    </div>
+                    <div class="total-item">
+                        <span class="total-label">CARROS RETIRADOS</span>
+                        <span class="total-value" id="totalRetirados">0</span>
+                    </div>
+                    <div class="total-item">
+                        <span class="total-label">PCT EXPEDIDOS</span>
+                        <span class="total-value" id="totalPct">0</span>
+                    </div>
+                    <div class="total-item">
+                        <span class="total-label">NO SHOW</span>
+                        <span class="total-value" id="totalNoShow">0</span>
+                    </div>
+                </div>
+
+                <h3>Totais por Data</h3>
+                <div class="table-wrapper" id="agrupamentoWrapper">
+                    <table id="tabelaAgrupamento">
+                        <thead>
+                            <tr>
+                                <th>DATA</th>
+                                <th>SUPERVISOR/COORDENADOR</th>
+                                <th>ENCARREGADO</th>
+                                <th>CARROS OFERTADOS</th>
+                                <th>CARROS RETIRADOS</th>
+                                <th>PCT EXPEDIDOS</th>
+                                <th>NO SHOW</th>
+                                <th>ENTREGADORES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyAgrupamento"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card export-card">
+                <h2>Exportar</h2>
+                <div class="export-actions">
+                    <button class="btn btn-export" id="btnExportPDF">
+                        Exportar PDF
+                    </button>
+                    <button class="btn btn-export" id="btnExportExcel">
+                        Exportar Excel
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <div id="confirmModal" class="modal">
+            <div class="modal-content">
+                <p>Tem certeza que deseja limpar todos os dados?</p>
+                <div class="modal-actions">
+                    <button class="btn btn-danger" id="modalConfirm">
+                        Sim, Limpar
+                    </button>
+                    <button class="btn btn-secondary" id="modalCancel">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>
