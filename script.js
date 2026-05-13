@@ -294,11 +294,24 @@
     });
   }
 
+  function baixarBlob(blob, nome) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+  }
+
   function exportarExcel() {
     if (dados.length === 0) { alert("Nenhum registro para exportar."); return; }
     var filename = "RELATÓRIO REPORTE BASE " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".XLSX";
     gerarBlobExcel().then(function (blob) {
-      saveAs(blob, filename);
+      baixarBlob(blob, filename);
+    }).catch(function () {
+      alert("Erro ao gerar o arquivo Excel.");
     });
   }
 
@@ -306,13 +319,20 @@
     if (dados.length === 0) { alert("Nenhum registro para exportar."); return; }
     var filename = "RELATÓRIO REPORTE BASE " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".XLSX";
     gerarBlobExcel().then(function (blob) {
-      var file = new File([blob], filename, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: filename }).catch(function () {});
-      } else {
-        saveAs(blob, filename);
-        alert("Compartilhamento n\u00e3o suportado neste dispositivo. O arquivo foi baixado.");
+      try {
+        var file = new File([blob], filename, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        if (navigator.share) {
+          navigator.share({ files: [file], title: filename }).catch(function () {
+            baixarBlob(blob, filename);
+          });
+        } else {
+          baixarBlob(blob, filename);
+        }
+      } catch (e) {
+        baixarBlob(blob, filename);
       }
+    }).catch(function () {
+      alert("Erro ao gerar o arquivo Excel.");
     });
   }
 
