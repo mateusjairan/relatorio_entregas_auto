@@ -24,6 +24,7 @@
     btnLimpar: $("btnLimpar"),
     btnExportPDF: $("btnExportPDF"),
     btnExportExcel: $("btnExportExcel"),
+    btnCompartilhar: $("btnCompartilhar"),
     modal: $("confirmModal"),
     modalConfirm: $("modalConfirm"),
     modalCancel: $("modalCancel"),
@@ -225,9 +226,7 @@
     }
   }
 
-  function exportarExcel() {
-    if (dados.length === 0) { alert("Nenhum registro para exportar."); return; }
-
+  function gerarBlobExcel() {
     var nomesColunas = ["DATA", "SUPERVISOR/COORDENADOR", "ENCARREGADO", "HUB", "ENTREGADOR", "REGIÃO/ BAIRRO", "AM/PM", "HORÁRIO INCIADO", "CARROS OFERTADOS", "CARROS RETIRADOS", "PCT EXPEDIDOS", "NO SHOW"];
     var colLarguras = [15.74, 26.36, 13.99, 14.80, 40.63, 25.96, 9.68, 21.39, 18.70, 18.16, 14.26, 10.76];
 
@@ -290,11 +289,30 @@
       row.getCell(1).numFmt = "mm-dd-yy";
     }
 
-    var filename = "RELATÓRIO REPORTE BASE " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".XLSX";
+    return wb.xlsx.writeBuffer().then(function (buffer) {
+      return new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    });
+  }
 
-    wb.xlsx.writeBuffer().then(function (buffer) {
-      var blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  function exportarExcel() {
+    if (dados.length === 0) { alert("Nenhum registro para exportar."); return; }
+    var filename = "RELATÓRIO REPORTE BASE " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".XLSX";
+    gerarBlobExcel().then(function (blob) {
       saveAs(blob, filename);
+    });
+  }
+
+  function compartilharExcel() {
+    if (dados.length === 0) { alert("Nenhum registro para exportar."); return; }
+    var filename = "RELATÓRIO REPORTE BASE " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".XLSX";
+    gerarBlobExcel().then(function (blob) {
+      var file = new File([blob], filename, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: filename }).catch(function () {});
+      } else {
+        saveAs(blob, filename);
+        alert("Compartilhamento n\u00e3o suportado neste dispositivo. O arquivo foi baixado.");
+      }
     });
   }
 
@@ -360,6 +378,10 @@
 
     if (dom.btnExportExcel) {
       dom.btnExportExcel.addEventListener("click", exportarExcel);
+    }
+
+    if (dom.btnCompartilhar) {
+      dom.btnCompartilhar.addEventListener("click", compartilharExcel);
     }
 
     if (inputs.hub && dom.hubDisplay) {

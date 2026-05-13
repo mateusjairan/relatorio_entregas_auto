@@ -167,6 +167,16 @@ body {
     background: #1e6b3a;
 }
 
+.btn-share {
+    background: #25D366;
+    color: #fff;
+    min-width: 180px;
+}
+
+.btn-share:hover {
+    background: #1da851;
+}
+
 .section-header {
     display: flex;
     justify-content: space-between;
