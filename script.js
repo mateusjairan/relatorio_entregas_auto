@@ -491,9 +491,21 @@
       alert("Nenhum registro para exportar.");
       return;
     }
+    var datas = [];
+    for (var i = 0; i < dados.length; i++) {
+      if (datas.indexOf(dados[i].data) === -1) datas.push(dados[i].data);
+    }
+    datas.sort();
+    var parteData = datas
+      .map(function (d) {
+        var p = d.split("-");
+        return p[2] + "/" + p[1] + "/" + p[0];
+      })
+      .join(" a ");
     var filename =
       "RELATÓRIO REPORTE BASE " +
       (dados.length > 0 ? dados[0].hub : "LMG-21") +
+      " " + parteData +
       ".XLSX";
     gerarBlobExcel()
       .then(function (blob) {
