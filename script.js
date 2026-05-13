@@ -500,55 +500,67 @@
       return;
     }
 
-    if (!arquivoExcelPronto) {
-      alert("O arquivo ainda está sendo processado. Aguarde um segundo e tente novamente.");
-      return;
-    }
+    var btn = dom.btnCompartilhar;
+    btn.disabled = true;
+    btn.textContent = "PREPARANDO...";
 
-    var file = new File(
-      [arquivoExcelPronto.blob],
-      arquivoExcelPronto.filename,
-      {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      }
-    );
+    // CORREÇÃO DA CAUSA 2: Se o arquivo não estiver pronto, geramos na hora!
+    var promiseArquivo = arquivoExcelPronto
+      ? Promise.resolve(arquivoExcelPronto)
+      : gerarBlobExcel().then(function (blob) {
+          var hubLimpo = dados[0].hub ? dados[0].hub.replace(/\s+/g, "_") : "LMG-21";
+          var filename = "RELATORIO_REPORTE_BASE_" + hubLimpo + ".xlsx";
+          return { blob: blob, filename: filename };
+        });
 
-    // ================= INÍCIO DO DIAGNÓSTICO =================
-    
-    // 1. O navegador tem a API de compartilhamento?
-    if (!navigator.share) {
-      alert("Diagnóstico: Seu navegador NÃO suporta navigator.share. (Você está num app como WhatsApp/Instagram?). O arquivo será baixado.");
-      baixarBlob(arquivoExcelPronto.blob, arquivoExcelPronto.filename);
-      return;
-    }
+    promiseArquivo
+      .then(function (arquivo) {
+        
+        // CORREÇÃO DA CAUSA 3: Truque do MIME Type genérico
+        // Muitos celulares bloqueiam o tipo Excel longo, mas aceitam o octet-stream
+        var file = new File([arquivo.blob], arquivo.filename, {
+          type: "application/octet-stream", 
+        });
 
-    // 2. O navegador suporta enviar ARQUIVOS pela API?
-    var suportaArquivos = navigator.canShare ? navigator.canShare({ files: [file] }) : false;
-    
-    if (!suportaArquivos) {
-      alert("Diagnóstico: Seu navegador suporta compartilhar, mas NÃO suporta enviar arquivos .xlsx (apenas textos ou links). O arquivo será baixado.");
-      baixarBlob(arquivoExcelPronto.blob, arquivoExcelPronto.filename);
-      return;
-    }
+        var podeCompartilhar = navigator.canShare
+          ? navigator.canShare({ files: [file] })
+          : false;
 
-    // ================= FIM DO DIAGNÓSTICO =================
-
-
-    // Se passou pelos diagnósticos, tenta compartilhar
-    navigator
-      .share({
-        files: [file],
-        title: arquivoExcelPronto.filename,
-        text: "Segue o relatório operacional.",
-      })
-      .then(function () {
-        console.log("Compartilhado com sucesso");
-      })
-      .catch(function (error) {
-        if (error.name !== "AbortError") {
-          alert("Diagnóstico: O menu abriu, mas deu erro ao enviar: " + error.message + ". O arquivo será baixado.");
-          baixarBlob(arquivoExcelPronto.blob, arquivoExcelPronto.filename);
+        if (navigator.share && podeCompartilhar) {
+          btn.textContent = "COMPARTILHANDO...";
+          
+          navigator
+            .share({
+              files: [file],
+              title: arquivo.filename,
+              text: "Segue o relatório operacional.",
+            })
+            .then(function () {
+              console.log("Compartilhado com sucesso");
+            })
+            .catch(function (error) {
+              // Se o usuário cancelar, não faz nada. Se der erro, baixa.
+              if (error.name !== "AbortError") {
+                baixarBlob(arquivo.blob, arquivo.filename);
+              }
+            })
+            .finally(function () {
+              btn.textContent = "COMPARTILHAR EXCEL";
+              btn.disabled = false;
+            });
+        } else {
+          // Fallback: Navegador realmente não suporta compartilhar arquivos
+          alert("Seu navegador não suporta compartilhar este arquivo diretamente. O arquivo será baixado para que você possa enviá-lo pelo WhatsApp manualmente.");
+          baixarBlob(arquivo.blob, arquivo.filename);
+          btn.textContent = "COMPARTILHAR EXCEL";
+          btn.disabled = false;
         }
+      })
+      .catch(function (err) {
+        console.error("Erro ao gerar arquivo para compartilhar:", err);
+        alert("Erro ao preparar o arquivo.");
+        btn.textContent = "COMPARTILHAR EXCEL";
+        btn.disabled = false;
       });
   }
 
