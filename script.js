@@ -4,8 +4,11 @@
   const STORAGE_KEY = "relatorioLmg21";
 
   let dados = [];
+  let arquivoExcelPronto = null;
 
-  function $(id) { return document.getElementById(id); }
+  function $(id) {
+    return document.getElementById(id);
+  }
 
   function safeText(el, value) {
     if (el) el.textContent = value;
@@ -48,8 +51,12 @@
   function carregarStorage() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) { dados = JSON.parse(raw); }
-    } catch (_) { dados = []; }
+      if (raw) {
+        dados = JSON.parse(raw);
+      }
+    } catch (_) {
+      dados = [];
+    }
   }
 
   function salvarStorage() {
@@ -58,7 +65,13 @@
 
   function hoje() {
     var d = new Date();
-    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    return (
+      d.getFullYear() +
+      "-" +
+      String(d.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(d.getDate()).padStart(2, "0")
+    );
   }
 
   function setDefaults() {
@@ -103,21 +116,43 @@
       regiao: inputs.regiao ? inputs.regiao.value.trim() : "",
       turno: inputs.turno ? inputs.turno.value : "",
       horario: inputs.horario ? inputs.horario.value : "",
-      carrosOfertados: inputs.carrosOfertados ? toNumber(inputs.carrosOfertados.value) : 0,
-      carrosRetirados: inputs.carrosRetirados ? toNumber(inputs.carrosRetirados.value) : 0,
-      pctExpedidos: inputs.pctExpedidos ? toNumber(inputs.pctExpedidos.value) : 0,
+      carrosOfertados: inputs.carrosOfertados
+        ? toNumber(inputs.carrosOfertados.value)
+        : 0,
+      carrosRetirados: inputs.carrosRetirados
+        ? toNumber(inputs.carrosRetirados.value)
+        : 0,
+      pctExpedidos: inputs.pctExpedidos
+        ? toNumber(inputs.pctExpedidos.value)
+        : 0,
       noShow: inputs.noShow ? toNumber(inputs.noShow.value) : 0,
     };
   }
 
   function adicionarRegistro(d) {
-    dados.push({ id: Date.now() + Math.random(), data: d.data, supervisor: d.supervisor, encarregado: d.encarregado, hub: d.hub, entregador: d.entregador, regiao: d.regiao, turno: d.turno, horario: d.horario, carrosOfertados: d.carrosOfertados, carrosRetirados: d.carrosRetirados, pctExpedidos: d.pctExpedidos, noShow: d.noShow });
+    dados.push({
+      id: Date.now() + Math.random(),
+      data: d.data,
+      supervisor: d.supervisor,
+      encarregado: d.encarregado,
+      hub: d.hub,
+      entregador: d.entregador,
+      regiao: d.regiao,
+      turno: d.turno,
+      horario: d.horario,
+      carrosOfertados: d.carrosOfertados,
+      carrosRetirados: d.carrosRetirados,
+      pctExpedidos: d.pctExpedidos,
+      noShow: d.noShow,
+    });
     salvarStorage();
     renderizar();
   }
 
   function excluirRegistro(id) {
-    dados = dados.filter(function (item) { return item.id !== id; });
+    dados = dados.filter(function (item) {
+      return item.id !== id;
+    });
     salvarStorage();
     renderizar();
   }
@@ -139,20 +174,47 @@
     var html = "";
     for (var i = 0; i < dados.length; i++) {
       var item = dados[i];
-      html += "<tr>" +
-        "<td>" + formatDate(item.data) + "</td>" +
-        "<td>" + esc(item.supervisor) + "</td>" +
-        "<td>" + esc(item.encarregado) + "</td>" +
-        "<td>" + esc(item.hub) + "</td>" +
-        "<td>" + esc(item.entregador) + "</td>" +
-        "<td>" + esc(item.regiao) + "</td>" +
-        "<td>" + item.turno + "</td>" +
-        "<td>" + (item.horario ? item.horario.slice(0, 5) : "") + "</td>" +
-        "<td>" + item.carrosOfertados + "</td>" +
-        "<td>" + item.carrosRetirados + "</td>" +
-        "<td>" + item.pctExpedidos + "</td>" +
-        "<td>" + item.noShow + "</td>" +
-        '<td><button class="btn-excluir" data-id="' + item.id + '" title="Excluir">&times;</button></td>' +
+      html +=
+        "<tr>" +
+        "<td>" +
+        formatDate(item.data) +
+        "</td>" +
+        "<td>" +
+        esc(item.supervisor) +
+        "</td>" +
+        "<td>" +
+        esc(item.encarregado) +
+        "</td>" +
+        "<td>" +
+        esc(item.hub) +
+        "</td>" +
+        "<td>" +
+        esc(item.entregador) +
+        "</td>" +
+        "<td>" +
+        esc(item.regiao) +
+        "</td>" +
+        "<td>" +
+        item.turno +
+        "</td>" +
+        "<td>" +
+        (item.horario ? item.horario.slice(0, 5) : "") +
+        "</td>" +
+        "<td>" +
+        item.carrosOfertados +
+        "</td>" +
+        "<td>" +
+        item.carrosRetirados +
+        "</td>" +
+        "<td>" +
+        item.pctExpedidos +
+        "</td>" +
+        "<td>" +
+        item.noShow +
+        "</td>" +
+        '<td><button class="btn-excluir" data-id="' +
+        item.id +
+        '" title="Excluir">&times;</button></td>' +
         "</tr>";
     }
     dom.tbody.innerHTML = html;
@@ -167,7 +229,10 @@
   }
 
   function calcularTotais() {
-    var somaO = 0, somaR = 0, somaP = 0, somaN = 0;
+    var somaO = 0,
+      somaR = 0,
+      somaP = 0,
+      somaN = 0;
     for (var i = 0; i < dados.length; i++) {
       var item = dados[i];
       somaO += item.carrosOfertados;
@@ -188,7 +253,16 @@
       var item = dados[i];
       var key = item.data;
       if (!map[key]) {
-        map[key] = { data: item.data, supervisor: item.supervisor, encarregado: item.encarregado, carrosOfertados: 0, carrosRetirados: 0, pctExpedidos: 0, noShow: 0, entregadores: [] };
+        map[key] = {
+          data: item.data,
+          supervisor: item.supervisor,
+          encarregado: item.encarregado,
+          carrosOfertados: 0,
+          carrosRetirados: 0,
+          pctExpedidos: 0,
+          noShow: 0,
+          entregadores: [],
+        };
       }
       var g = map[key];
       g.carrosOfertados += item.carrosOfertados;
@@ -203,15 +277,32 @@
     var html = "";
     for (var j = 0; j < keys.length; j++) {
       var g = map[keys[j]];
-      html += "<tr>" +
-        "<td>" + formatDate(g.data) + "</td>" +
-        "<td>" + esc(g.supervisor) + "</td>" +
-        "<td>" + esc(g.encarregado) + "</td>" +
-        "<td>" + g.carrosOfertados + "</td>" +
-        "<td>" + g.carrosRetirados + "</td>" +
-        "<td>" + g.pctExpedidos + "</td>" +
-        "<td>" + g.noShow + "</td>" +
-        "<td>" + g.entregadores.length + "</td>" +
+      html +=
+        "<tr>" +
+        "<td>" +
+        formatDate(g.data) +
+        "</td>" +
+        "<td>" +
+        esc(g.supervisor) +
+        "</td>" +
+        "<td>" +
+        esc(g.encarregado) +
+        "</td>" +
+        "<td>" +
+        g.carrosOfertados +
+        "</td>" +
+        "<td>" +
+        g.carrosRetirados +
+        "</td>" +
+        "<td>" +
+        g.pctExpedidos +
+        "</td>" +
+        "<td>" +
+        g.noShow +
+        "</td>" +
+        "<td>" +
+        g.entregadores.length +
+        "</td>" +
         "</tr>";
     }
     dom.tbodyAgrup.innerHTML = html;
@@ -222,13 +313,49 @@
     calcularTotais();
     renderizarAgrupamento();
     if (dom.hubDisplay) {
-      dom.hubDisplay.textContent = dados.length > 0 ? dados[0].hub : "LMG-21 Muriaé";
+      dom.hubDisplay.textContent =
+        dados.length > 0 ? dados[0].hub : "LMG-21 Muriaé";
     }
+
+    // --- INÍCIO DA PRÉ-GERAÇÃO ---
+    if (dados.length > 0) {
+      gerarBlobExcel()
+        .then(function (blob) {
+          var hubLimpo = dados[0].hub
+            ? dados[0].hub.replace(/\s+/g, "_")
+            : "LMG-21";
+          var filename = "RELATORIO_REPORTE_BASE_" + hubLimpo + ".xlsx";
+          arquivoExcelPronto = { blob: blob, filename: filename };
+        })
+        .catch(function (err) {
+          console.error("Erro na pré-geração do Excel:", err);
+          arquivoExcelPronto = null;
+        });
+    } else {
+      arquivoExcelPronto = null;
+    }
+    // --- FIM DA PRÉ-GERAÇÃO ---
   }
 
   function gerarBlobExcel() {
-    var nomesColunas = ["DATA", "SUPERVISOR/COORDENADOR", "ENCARREGADO", "HUB", "ENTREGADOR", "REGIÃO/ BAIRRO", "AM/PM", "HORÁRIO INCIADO", "CARROS OFERTADOS", "CARROS RETIRADOS", "PCT EXPEDIDOS", "NO SHOW"];
-    var colLarguras = [15.74, 26.36, 13.99, 14.80, 40.63, 25.96, 9.68, 21.39, 18.70, 18.16, 14.26, 10.76];
+    var nomesColunas = [
+      "DATA",
+      "SUPERVISOR/COORDENADOR",
+      "ENCARREGADO",
+      "HUB",
+      "ENTREGADOR",
+      "REGIÃO/ BAIRRO",
+      "AM/PM",
+      "HORÁRIO INCIADO",
+      "CARROS OFERTADOS",
+      "CARROS RETIRADOS",
+      "PCT EXPEDIDOS",
+      "NO SHOW",
+    ];
+    var colLarguras = [
+      15.74, 26.36, 13.99, 14.8, 40.63, 25.96, 9.68, 21.39, 18.7, 18.16, 14.26,
+      10.76,
+    ];
 
     function paraValorData(str) {
       if (!str) return null;
@@ -239,19 +366,51 @@
     }
 
     function estiloCabecalho() {
-      return { font: { name: "Calibri", size: 11, bold: true, color: { argb: "FFFFFFFF" } }, fill: { type: "pattern", pattern: "solid", fgColor: { argb: "FF4472C4" } }, alignment: { horizontal: "center", vertical: "center" }, border: { top: { style: "thin", color: { argb: "FF000000" } }, bottom: { style: "thin", color: { argb: "FF000000" } }, left: { style: "thin", color: { argb: "FF000000" } }, right: { style: "thin", color: { argb: "FF000000" } } } };
+      return {
+        font: {
+          name: "Calibri",
+          size: 11,
+          bold: true,
+          color: { argb: "FFFFFFFF" },
+        },
+        fill: {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FF4472C4" },
+        },
+        alignment: { horizontal: "center", vertical: "center" },
+        border: {
+          top: { style: "thin", color: { argb: "FF000000" } },
+          bottom: { style: "thin", color: { argb: "FF000000" } },
+          left: { style: "thin", color: { argb: "FF000000" } },
+          right: { style: "thin", color: { argb: "FF000000" } },
+        },
+      };
     }
 
     function estiloDado() {
-      return { font: { name: "Calibri", size: 11, color: { argb: "FF000000" } }, alignment: { horizontal: "center" }, border: { top: { style: "thin", color: { argb: "FF000000" } }, bottom: { style: "thin", color: { argb: "FF000000" } }, left: { style: "thin", color: { argb: "FF000000" } }, right: { style: "thin", color: { argb: "FF000000" } } } };
+      return {
+        font: { name: "Calibri", size: 11, color: { argb: "FF000000" } },
+        alignment: { horizontal: "center" },
+        border: {
+          top: { style: "thin", color: { argb: "FF000000" } },
+          bottom: { style: "thin", color: { argb: "FF000000" } },
+          left: { style: "thin", color: { argb: "FF000000" } },
+          right: { style: "thin", color: { argb: "FF000000" } },
+        },
+      };
     }
 
     var wb = new ExcelJS.Workbook();
     wb.creator = "SB Farma";
     wb.created = new Date();
-    var ws = wb.addWorksheet("Planilha1", { pageSetup: { orientation: "portrait", paperSize: 9 } });
+    var ws = wb.addWorksheet("Planilha1", {
+      pageSetup: { orientation: "portrait", paperSize: 9 },
+    });
 
-    for (var c = 0; c < colLarguras.length; c++) { ws.getColumn(c + 1).width = colLarguras[c]; }
+    for (var c = 0; c < colLarguras.length; c++) {
+      ws.getColumn(c + 1).width = colLarguras[c];
+    }
 
     var cabRow = ws.getRow(1);
     for (var c2 = 0; c2 < nomesColunas.length; c2++) {
@@ -278,19 +437,24 @@
       var hp = (item.horario || "00:00").split(":");
       var h = parseInt(hp[0], 10) || 0;
       var m = parseInt(hp[1], 10) || 0;
-      row.getCell(8).value = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+      row.getCell(8).value =
+        (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
 
       row.getCell(9).value = item.carrosOfertados;
       row.getCell(10).value = item.carrosRetirados;
       row.getCell(11).value = item.pctExpedidos;
       row.getCell(12).value = item.noShow;
 
-      for (var col = 1; col <= 12; col++) { row.getCell(col).style = estiloDado(); }
+      for (var col = 1; col <= 12; col++) {
+        row.getCell(col).style = estiloDado();
+      }
       row.getCell(1).numFmt = "mm-dd-yy";
     }
 
     return wb.xlsx.writeBuffer().then(function (buffer) {
-      return new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      return new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
     });
   }
 
@@ -302,97 +466,78 @@
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+    setTimeout(function () {
+      URL.revokeObjectURL(url);
+    }, 10000);
     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      setTimeout(function () { window.open(url, "_blank"); }, 200);
+      setTimeout(function () {
+        window.open(url, "_blank");
+      }, 200);
     }
   }
 
   function exportarExcel() {
-    if (dados.length === 0) { alert("Nenhum registro para exportar."); return; }
-    var filename = "RELATÓRIO REPORTE BASE " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".XLSX";
-    gerarBlobExcel().then(function (blob) {
-      baixarBlob(blob, filename);
-    }).catch(function () {
-      alert("Erro ao gerar o arquivo Excel.");
-    });
+    if (dados.length === 0) {
+      alert("Nenhum registro para exportar.");
+      return;
+    }
+    var filename =
+      "RELATÓRIO REPORTE BASE " +
+      (dados.length > 0 ? dados[0].hub : "LMG-21") +
+      ".XLSX";
+    gerarBlobExcel()
+      .then(function (blob) {
+        baixarBlob(blob, filename);
+      })
+      .catch(function () {
+        alert("Erro ao gerar o arquivo Excel.");
+      });
   }
 
   function compartilharExcel() {
-    if (dados.length === 0) { alert("Nenhum registro para exportar."); return; }
+    if (dados.length === 0) {
+      alert("Nenhum registro para exportar.");
+      return;
+    }
 
-    var btn = dom.btnCompartilhar;
-    var textoOriginal = btn.textContent;
-    
-    btn.disabled = true;
-    btn.textContent = "GERANDO ARQUIVO...";
+    // Se o arquivo ainda estiver gerando (pouco provável, mas seguro)
+    if (!arquivoExcelPronto) {
+      alert(
+        "O arquivo ainda está sendo processado. Aguarde um segundo e tente novamente.",
+      );
+      return;
+    }
 
-    var hubLimpo = dados.length > 0 ? dados[0].hub.replace(/\s+/g, '_') : "LMG-21";
-    var filename = "RELATORIO_REPORTE_BASE_" + hubLimpo + ".xlsx";
+    var file = new File(
+      [arquivoExcelPronto.blob],
+      arquivoExcelPronto.filename,
+      {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      },
+    );
 
-    gerarBlobExcel().then(function (blob) {
-      var file = new File([blob], filename, { 
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
-      });
-
-      // ================= INÍCIO DO RAIO-X =================
-      if (!navigator.share) {
-        alert("Debug 1: Seu navegador NÃO tem navigator.share. (Você está em HTTPS?). Vai baixar.");
-        baixarBlob(blob, filename);
-        btn.textContent = textoOriginal;
-        btn.disabled = false;
-        return;
-      }
-
-      if (!navigator.canShare) {
-        alert("Debug 2: Seu navegador tem Share, mas NÃO tem canShare (Navegador antigo). Vai tentar baixar.");
-        baixarBlob(blob, filename);
-        btn.textContent = textoOriginal;
-        btn.disabled = false;
-        return;
-      }
-
-      var podeCompartilharArquivos = navigator.canShare({ files: [file] });
-
-      if (!podeCompartilharArquivos) {
-        alert("Debug 3: Seu navegador suporta Share, mas NÃO suporta enviar Arquivos (apenas links). Vai baixar.");
-        baixarBlob(blob, filename);
-        btn.textContent = textoOriginal;
-        btn.disabled = false;
-        return;
-      }
-      // ================= FIM DO RAIO-X =================
-
-
-      // Se passou por tudo, tenta compartilhar
-      btn.textContent = "COMPARTILHANDO...";
-      
-      navigator.share({
-        files: [file],
-        title: filename,
-        text: "Segue o relatório operacional."
-      })
-      .then(function() {
-        console.log('Compartilhado com sucesso');
-      })
-      .catch(function(error) {
-        if (error.name !== 'AbortError') {
-          // Se deu erro e não foi o usuário cancelando, avisa
-          alert("Debug 4: Erro ao abrir o compartilhamento: " + error.message + ". Vai baixar.");
-          baixarBlob(blob, filename);
-        }
-      })
-      .finally(function() {
-        btn.textContent = textoOriginal;
-        btn.disabled = false;
-      });
-
-    }).catch(function (err) {
-      console.error('Erro ao gerar Excel:', err);
-      alert("Erro ao gerar o arquivo Excel.");
-      btn.textContent = textoOriginal;
-      btn.disabled = false;
-    });
+    // Verifica se o celular suporta compartilhar ARQUIVOS
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator
+        .share({
+          files: [file],
+          title: arquivoExcelPronto.filename,
+          text: "Segue o relatório operacional.",
+        })
+        .then(function () {
+          console.log("Compartilhado com sucesso");
+        })
+        .catch(function (error) {
+          // O usuário simplesmente fechou o menu sem compartilhar (AbortError)
+          if (error.name !== "AbortError") {
+            console.error("Erro ao compartilhar:", error);
+            baixarBlob(arquivoExcelPronto.blob, arquivoExcelPronto.filename);
+          }
+        });
+    } else {
+      // Fallback: Celular não suporta compartilhar arquivos (ex: Firefox, alguns Androids antigos)
+      baixarBlob(arquivoExcelPronto.blob, arquivoExcelPronto.filename);
+    }
   }
 
   function limparCampos() {
@@ -411,7 +556,10 @@
     e.preventDefault();
     var d = getFormData();
     var erro = validarForm(d);
-    if (erro) { alert(erro); return; }
+    if (erro) {
+      alert(erro);
+      return;
+    }
     adicionarRegistro(d);
     limparCampos();
   }
@@ -419,14 +567,33 @@
   function init() {
     carregarStorage();
 
-    if (!dom.form) { alert("Elemento cr\u00edtico ausente: form#formEntrega"); return; }
-    if (!dom.tbody) { alert("Elemento cr\u00edtico ausente: tbody#tbodyRelatorio"); return; }
-    if (!inputs.data || !inputs.supervisor || !inputs.encarregado || !inputs.hub || !inputs.entregador || !inputs.regiao || !inputs.turno || !inputs.horario) {
-      alert("Um ou mais campos do formul\u00e1rio n\u00e3o foram encontrados no DOM.");
+    if (!dom.form) {
+      alert("Elemento cr\u00edtico ausente: form#formEntrega");
+      return;
+    }
+    if (!dom.tbody) {
+      alert("Elemento cr\u00edtico ausente: tbody#tbodyRelatorio");
+      return;
+    }
+    if (
+      !inputs.data ||
+      !inputs.supervisor ||
+      !inputs.encarregado ||
+      !inputs.hub ||
+      !inputs.entregador ||
+      !inputs.regiao ||
+      !inputs.turno ||
+      !inputs.horario
+    ) {
+      alert(
+        "Um ou mais campos do formul\u00e1rio n\u00e3o foram encontrados no DOM.",
+      );
       return;
     }
 
-    if (dados.length === 0) { setDefaults(); }
+    if (dados.length === 0) {
+      setDefaults();
+    }
 
     renderizar();
 
@@ -434,23 +601,44 @@
 
     var btnReset = dom.form.querySelector('[type="reset"]');
     if (btnReset) {
-      btnReset.addEventListener("click", function (e) { e.preventDefault(); limparCampos(); });
+      btnReset.addEventListener("click", function (e) {
+        e.preventDefault();
+        limparCampos();
+      });
     }
 
     if (dom.modal && dom.modalConfirm && dom.modalCancel) {
-      dom.btnLimpar.addEventListener("click", function () { dom.modal.classList.add("active"); });
-      dom.modalConfirm.addEventListener("click", function () { limparDados(); dom.modal.classList.remove("active"); });
-      dom.modalCancel.addEventListener("click", function () { dom.modal.classList.remove("active"); });
-      dom.modal.addEventListener("click", function (e) { if (e.target === dom.modal) { dom.modal.classList.remove("active"); } });
+      dom.btnLimpar.addEventListener("click", function () {
+        dom.modal.classList.add("active");
+      });
+      dom.modalConfirm.addEventListener("click", function () {
+        limparDados();
+        dom.modal.classList.remove("active");
+      });
+      dom.modalCancel.addEventListener("click", function () {
+        dom.modal.classList.remove("active");
+      });
+      dom.modal.addEventListener("click", function (e) {
+        if (e.target === dom.modal) {
+          dom.modal.classList.remove("active");
+        }
+      });
     } else {
       if (dom.btnLimpar) {
-        dom.btnLimpar.addEventListener("click", function () { if (confirm("Tem certeza que deseja limpar todos os dados?")) { limparDados(); } });
+        dom.btnLimpar.addEventListener("click", function () {
+          if (confirm("Tem certeza que deseja limpar todos os dados?")) {
+            limparDados();
+          }
+        });
       }
     }
 
     if (dom.btnExportPDF) {
       dom.btnExportPDF.addEventListener("click", function () {
-        if (dados.length === 0) { alert("Nenhum registro para exportar."); return; }
+        if (dados.length === 0) {
+          alert("Nenhum registro para exportar.");
+          return;
+        }
         window.print();
       });
     }
