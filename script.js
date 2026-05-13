@@ -303,6 +303,9 @@
     a.click();
     document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+      setTimeout(function () { window.open(url, "_blank"); }, 200);
+    }
   }
 
   function exportarExcel() {
@@ -318,20 +321,38 @@
   function compartilharExcel() {
     if (dados.length === 0) { alert("Nenhum registro para exportar."); return; }
     var filename = "RELATÓRIO REPORTE BASE " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".XLSX";
+
+    var btn = dom.btnCompartilhar;
+    btn.disabled = true;
+    btn.textContent = "GERANDO...";
+
     gerarBlobExcel().then(function (blob) {
       try {
-        var file = new File([blob], filename, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-        if (navigator.share) {
+        var file = new File([blob], filename, { type: "application/octet-stream" });
+        if (!navigator.share) {
+          baixarBlob(blob, filename);
+          return;
+        }
+        btn.disabled = false;
+        btn.textContent = "COMPARTILHAR AGORA";
+        btn.onclick = function () {
           navigator.share({ files: [file], title: filename }).catch(function () {
             baixarBlob(blob, filename);
+            alert("Compartilhamento n\u00e3o dispon\u00edvel. Arquivo baixado.");
           });
-        } else {
-          baixarBlob(blob, filename);
-        }
+          btn.onclick = compartilharExcel;
+          btn.textContent = "COMPARTILHAR EXCEL";
+        };
       } catch (e) {
+        btn.disabled = false;
+        btn.textContent = "COMPARTILHAR EXCEL";
+        btn.onclick = compartilharExcel;
         baixarBlob(blob, filename);
       }
     }).catch(function () {
+      btn.disabled = false;
+      btn.textContent = "COMPARTILHAR EXCEL";
+      btn.onclick = compartilharExcel;
       alert("Erro ao gerar o arquivo Excel.");
     });
   }
