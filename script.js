@@ -320,9 +320,24 @@
 
   function compartilharExcel() {
     if (dados.length === 0) { alert("Nenhum registro para exportar."); return; }
-    var filename = "RELATÓRIO REPORTE BASE " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".XLSX";
 
     var btn = dom.btnCompartilhar;
+
+    if (window.__estadoCompartilhar) {
+      var data = window.__estadoCompartilhar;
+      window.__estadoCompartilhar = null;
+      btn.textContent = "COMPARTILHAR EXCEL";
+      if (navigator.share) {
+        navigator.share({ files: [data.file], title: data.filename }).catch(function () {
+          baixarBlob(data.blob, data.filename);
+        });
+      } else {
+        baixarBlob(data.blob, data.filename);
+      }
+      return;
+    }
+
+    var filename = "RELATÓRIO REPORTE BASE " + (dados.length > 0 ? dados[0].hub : "LMG-21") + ".XLSX";
     btn.disabled = true;
     btn.textContent = "GERANDO...";
 
@@ -331,28 +346,30 @@
         var file = new File([blob], filename, { type: "application/octet-stream" });
         if (!navigator.share) {
           baixarBlob(blob, filename);
+          btn.disabled = false;
+          btn.textContent = "COMPARTILHAR EXCEL";
           return;
         }
+        if (navigator.canShare && !navigator.canShare({ files: [file] })) {
+          var texto = "RELATÓRIO REPORTE BASE " + dados[0].hub + "\nTotal de registros: " + dados.length + "\n\nArquivo gerado. Envie manualmente pelo WhatsApp.";
+          navigator.share({ text: texto }).catch(function () {
+            baixarBlob(blob, filename);
+          });
+          btn.disabled = false;
+          btn.textContent = "COMPARTILHAR EXCEL";
+          return;
+        }
+        window.__estadoCompartilhar = { blob: blob, file: file, filename: filename };
         btn.disabled = false;
         btn.textContent = "COMPARTILHAR AGORA";
-        btn.onclick = function () {
-          navigator.share({ files: [file], title: filename }).catch(function () {
-            baixarBlob(blob, filename);
-            alert("Compartilhamento n\u00e3o dispon\u00edvel. Arquivo baixado.");
-          });
-          btn.onclick = compartilharExcel;
-          btn.textContent = "COMPARTILHAR EXCEL";
-        };
       } catch (e) {
         btn.disabled = false;
         btn.textContent = "COMPARTILHAR EXCEL";
-        btn.onclick = compartilharExcel;
         baixarBlob(blob, filename);
       }
     }).catch(function () {
       btn.disabled = false;
       btn.textContent = "COMPARTILHAR EXCEL";
-      btn.onclick = compartilharExcel;
       alert("Erro ao gerar o arquivo Excel.");
     });
   }
