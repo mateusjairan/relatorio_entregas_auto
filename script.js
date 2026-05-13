@@ -324,53 +324,68 @@
     var btn = dom.btnCompartilhar;
     var textoOriginal = btn.textContent;
     
-    // Desabilita o botão para evitar cliques múltiplos
     btn.disabled = true;
     btn.textContent = "GERANDO ARQUIVO...";
 
-    // Padroniza o nome do arquivo: sem espaços e sem acentos para evitar bugs no iOS/Android
     var hubLimpo = dados.length > 0 ? dados[0].hub.replace(/\s+/g, '_') : "LMG-21";
     var filename = "RELATORIO_REPORTE_BASE_" + hubLimpo + ".xlsx";
 
     gerarBlobExcel().then(function (blob) {
-      // Cria o objeto File
       var file = new File([blob], filename, { 
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
       });
 
-      // Verifica se o navegador REALMENTE suporta compartilhar ARQUIVOS (e não apenas texto)
-      var podeCompartilharArquivos = navigator.canShare && navigator.canShare({ files: [file] });
-
-      if (podeCompartilharArquivos) {
-        btn.textContent = "COMPARTILHANDO...";
-        
-        navigator.share({
-          files: [file],
-          title: filename,
-          text: "Segue o relatório operacional."
-        })
-        .then(function() {
-          console.log('Compartilhado com sucesso');
-        })
-        .catch(function(error) {
-          // Se o usuário cancelar no mobile, dá erro de 'AbortError', não faz nada.
-          // Se for outro erro, faz o download como fallback.
-          if (error.name !== 'AbortError') {
-            console.error('Erro ao compartilhar:', error);
-            baixarBlob(blob, filename);
-          }
-        })
-        .finally(function() {
-          // Restaura o botão independentemente do resultado
-          btn.textContent = textoOriginal;
-          btn.disabled = false;
-        });
-      } else {
-        // Fallback: Navegador não suporta compartilhar arquivos (Ex: Desktop, Firefox, iOS antigo)
+      // ================= INÍCIO DO RAIO-X =================
+      if (!navigator.share) {
+        alert("Debug 1: Seu navegador NÃO tem navigator.share. (Você está em HTTPS?). Vai baixar.");
         baixarBlob(blob, filename);
         btn.textContent = textoOriginal;
         btn.disabled = false;
+        return;
       }
+
+      if (!navigator.canShare) {
+        alert("Debug 2: Seu navegador tem Share, mas NÃO tem canShare (Navegador antigo). Vai tentar baixar.");
+        baixarBlob(blob, filename);
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
+        return;
+      }
+
+      var podeCompartilharArquivos = navigator.canShare({ files: [file] });
+
+      if (!podeCompartilharArquivos) {
+        alert("Debug 3: Seu navegador suporta Share, mas NÃO suporta enviar Arquivos (apenas links). Vai baixar.");
+        baixarBlob(blob, filename);
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
+        return;
+      }
+      // ================= FIM DO RAIO-X =================
+
+
+      // Se passou por tudo, tenta compartilhar
+      btn.textContent = "COMPARTILHANDO...";
+      
+      navigator.share({
+        files: [file],
+        title: filename,
+        text: "Segue o relatório operacional."
+      })
+      .then(function() {
+        console.log('Compartilhado com sucesso');
+      })
+      .catch(function(error) {
+        if (error.name !== 'AbortError') {
+          // Se deu erro e não foi o usuário cancelando, avisa
+          alert("Debug 4: Erro ao abrir o compartilhamento: " + error.message + ". Vai baixar.");
+          baixarBlob(blob, filename);
+        }
+      })
+      .finally(function() {
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
+      });
 
     }).catch(function (err) {
       console.error('Erro ao gerar Excel:', err);
