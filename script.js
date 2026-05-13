@@ -500,11 +500,8 @@
       return;
     }
 
-    // Se o arquivo ainda estiver gerando (pouco provável, mas seguro)
     if (!arquivoExcelPronto) {
-      alert(
-        "O arquivo ainda está sendo processado. Aguarde um segundo e tente novamente.",
-      );
+      alert("O arquivo ainda está sendo processado. Aguarde um segundo e tente novamente.");
       return;
     }
 
@@ -513,31 +510,46 @@
       arquivoExcelPronto.filename,
       {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      },
+      }
     );
 
-    // Verifica se o celular suporta compartilhar ARQUIVOS
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator
-        .share({
-          files: [file],
-          title: arquivoExcelPronto.filename,
-          text: "Segue o relatório operacional.",
-        })
-        .then(function () {
-          console.log("Compartilhado com sucesso");
-        })
-        .catch(function (error) {
-          // O usuário simplesmente fechou o menu sem compartilhar (AbortError)
-          if (error.name !== "AbortError") {
-            console.error("Erro ao compartilhar:", error);
-            baixarBlob(arquivoExcelPronto.blob, arquivoExcelPronto.filename);
-          }
-        });
-    } else {
-      // Fallback: Celular não suporta compartilhar arquivos (ex: Firefox, alguns Androids antigos)
+    // ================= INÍCIO DO DIAGNÓSTICO =================
+    
+    // 1. O navegador tem a API de compartilhamento?
+    if (!navigator.share) {
+      alert("Diagnóstico: Seu navegador NÃO suporta navigator.share. (Você está num app como WhatsApp/Instagram?). O arquivo será baixado.");
       baixarBlob(arquivoExcelPronto.blob, arquivoExcelPronto.filename);
+      return;
     }
+
+    // 2. O navegador suporta enviar ARQUIVOS pela API?
+    var suportaArquivos = navigator.canShare ? navigator.canShare({ files: [file] }) : false;
+    
+    if (!suportaArquivos) {
+      alert("Diagnóstico: Seu navegador suporta compartilhar, mas NÃO suporta enviar arquivos .xlsx (apenas textos ou links). O arquivo será baixado.");
+      baixarBlob(arquivoExcelPronto.blob, arquivoExcelPronto.filename);
+      return;
+    }
+
+    // ================= FIM DO DIAGNÓSTICO =================
+
+
+    // Se passou pelos diagnósticos, tenta compartilhar
+    navigator
+      .share({
+        files: [file],
+        title: arquivoExcelPronto.filename,
+        text: "Segue o relatório operacional.",
+      })
+      .then(function () {
+        console.log("Compartilhado com sucesso");
+      })
+      .catch(function (error) {
+        if (error.name !== "AbortError") {
+          alert("Diagnóstico: O menu abriu, mas deu erro ao enviar: " + error.message + ". O arquivo será baixado.");
+          baixarBlob(arquivoExcelPronto.blob, arquivoExcelPronto.filename);
+        }
+      });
   }
 
   function limparCampos() {
