@@ -198,9 +198,6 @@
         esc(item.hub) +
         "</td>" +
         "<td>" +
-        item.rotasHubOfertados +
-        "</td>" +
-        "<td>" +
         esc(item.entregador) +
         "</td>" +
         "<td>" +
@@ -214,6 +211,9 @@
         "</td>" +
         "<td>" +
         (item.horario ? item.horario.slice(0, 5) : "") +
+        "</td>" +
+        "<td>" +
+        item.rotasHubOfertados +
         "</td>" +
         "<td>" +
         item.carrosOfertados +
@@ -349,19 +349,19 @@
       "SUPERVISOR/COORDENADOR",
       "ENCARREGADO",
       "HUB",
-      "ROTAS HUB OFERTADOS",
       "ENTREGADOR",
       "REGIÃO/ BAIRRO",
       "AT/CAFs",
       "AM/PM",
       "HORÁRIO INCIADO",
+      "ROTAS HUB OFERTADOS",
       "CARROS OFERTADOS",
       "CARROS RETIRADOS",
       "PCT EXPEDIDOS",
       "NO SHOW",
     ];
     var colLarguras = [
-      15.74, 26.36, 13.99, 14.8, 18.7, 40.63, 25.96, 18.7, 9.68, 21.39, 18.7,
+      15.74, 26.36, 13.99, 14.8, 40.63, 25.96, 18.7, 9.68, 21.39, 18.7, 18.7,
       18.16, 14.26, 10.76,
     ];
 
@@ -438,18 +438,18 @@
       row.getCell(2).value = (item.supervisor || "").toUpperCase();
       row.getCell(3).value = (item.encarregado || "").toUpperCase();
       row.getCell(4).value = (item.hub || "").toUpperCase();
-      row.getCell(5).value = item.rotasHubOfertados;
-      row.getCell(6).value = (item.entregador || "").toUpperCase();
-      row.getCell(7).value = (item.regiao || "").toUpperCase();
-      row.getCell(8).value = (item.atCafs || "").toUpperCase();
-      row.getCell(9).value = (item.turno || "").toUpperCase();
+      row.getCell(5).value = (item.entregador || "").toUpperCase();
+      row.getCell(6).value = (item.regiao || "").toUpperCase();
+      row.getCell(7).value = (item.atCafs || "").toUpperCase();
+      row.getCell(8).value = (item.turno || "").toUpperCase();
 
       var hp = (item.horario || "00:00").split(":");
       var h = parseInt(hp[0], 10) || 0;
       var m = parseInt(hp[1], 10) || 0;
-      row.getCell(10).value =
+      row.getCell(9).value =
         (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
 
+      row.getCell(10).value = item.rotasHubOfertados;
       row.getCell(11).value = item.carrosOfertados;
       row.getCell(12).value = item.carrosRetirados;
       row.getCell(13).value = item.pctExpedidos;
