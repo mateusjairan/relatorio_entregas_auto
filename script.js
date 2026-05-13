@@ -4,7 +4,7 @@
   const STORAGE_KEY = "relatorioLmg21";
 
   let dados = [];
-  let arquivoExcelPronto = null;
+
 
   function $(id) {
     return document.getElementById(id);
@@ -19,15 +19,15 @@
     tbody: $("tbodyRelatorio"),
     tbodyAgrup: $("tbodyAgrupamento"),
     contagem: $("contagem"),
+    totalRotas: $("totalRotas"),
     totalOfertados: $("totalOfertados"),
     totalRetirados: $("totalRetirados"),
     totalPct: $("totalPct"),
     totalNoShow: $("totalNoShow"),
     hubDisplay: $("hubDisplay"),
     btnLimpar: $("btnLimpar"),
-    btnExportPDF: $("btnExportPDF"),
     btnExportExcel: $("btnExportExcel"),
-    btnCompartilhar: $("btnCompartilhar"),
+
     modal: $("confirmModal"),
     modalConfirm: $("modalConfirm"),
     modalCancel: $("modalCancel"),
@@ -38,8 +38,10 @@
     supervisor: $("supervisor"),
     encarregado: $("encarregado"),
     hub: $("hub"),
+    rotasHubOfertados: $("rotasHubOfertados"),
     entregador: $("entregador"),
     regiao: $("regiao"),
+    atCafs: $("atCafs"),
     turno: $("turno"),
     horario: $("horario"),
     carrosOfertados: $("carrosOfertados"),
@@ -77,6 +79,7 @@
   function setDefaults() {
     if (inputs.data) inputs.data.value = hoje();
     if (inputs.turno) inputs.turno.value = "AM";
+    if (inputs.rotasHubOfertados) inputs.rotasHubOfertados.value = "0";
     if (inputs.carrosOfertados) inputs.carrosOfertados.value = "0";
     if (inputs.carrosRetirados) inputs.carrosRetirados.value = "0";
     if (inputs.pctExpedidos) inputs.pctExpedidos.value = "0";
@@ -112,8 +115,12 @@
       supervisor: inputs.supervisor ? inputs.supervisor.value.trim() : "",
       encarregado: inputs.encarregado ? inputs.encarregado.value.trim() : "",
       hub: inputs.hub ? inputs.hub.value.trim() : "",
+      rotasHubOfertados: inputs.rotasHubOfertados
+        ? toNumber(inputs.rotasHubOfertados.value)
+        : 0,
       entregador: inputs.entregador ? inputs.entregador.value.trim() : "",
       regiao: inputs.regiao ? inputs.regiao.value.trim() : "",
+      atCafs: inputs.atCafs ? inputs.atCafs.value.trim() : "",
       turno: inputs.turno ? inputs.turno.value : "",
       horario: inputs.horario ? inputs.horario.value : "",
       carrosOfertados: inputs.carrosOfertados
@@ -136,8 +143,10 @@
       supervisor: d.supervisor,
       encarregado: d.encarregado,
       hub: d.hub,
+      rotasHubOfertados: d.rotasHubOfertados,
       entregador: d.entregador,
       regiao: d.regiao,
+      atCafs: d.atCafs,
       turno: d.turno,
       horario: d.horario,
       carrosOfertados: d.carrosOfertados,
@@ -189,10 +198,16 @@
         esc(item.hub) +
         "</td>" +
         "<td>" +
+        item.rotasHubOfertados +
+        "</td>" +
+        "<td>" +
         esc(item.entregador) +
         "</td>" +
         "<td>" +
         esc(item.regiao) +
+        "</td>" +
+        "<td>" +
+        esc(item.atCafs) +
         "</td>" +
         "<td>" +
         item.turno +
@@ -229,17 +244,20 @@
   }
 
   function calcularTotais() {
-    var somaO = 0,
+    var somaRota = 0,
+      somaO = 0,
       somaR = 0,
       somaP = 0,
       somaN = 0;
     for (var i = 0; i < dados.length; i++) {
       var item = dados[i];
+      somaRota += item.rotasHubOfertados;
       somaO += item.carrosOfertados;
       somaR += item.carrosRetirados;
       somaP += item.pctExpedidos;
       somaN += item.noShow;
     }
+    safeText(dom.totalRotas, somaRota);
     safeText(dom.totalOfertados, somaO);
     safeText(dom.totalRetirados, somaR);
     safeText(dom.totalPct, somaP);
@@ -257,6 +275,7 @@
           data: item.data,
           supervisor: item.supervisor,
           encarregado: item.encarregado,
+          rotasHubOfertados: 0,
           carrosOfertados: 0,
           carrosRetirados: 0,
           pctExpedidos: 0,
@@ -265,6 +284,7 @@
         };
       }
       var g = map[key];
+      g.rotasHubOfertados += item.rotasHubOfertados;
       g.carrosOfertados += item.carrosOfertados;
       g.carrosRetirados += item.carrosRetirados;
       g.pctExpedidos += item.pctExpedidos;
@@ -287,6 +307,9 @@
         "</td>" +
         "<td>" +
         esc(g.encarregado) +
+        "</td>" +
+        "<td>" +
+        g.rotasHubOfertados +
         "</td>" +
         "<td>" +
         g.carrosOfertados +
@@ -317,24 +340,7 @@
         dados.length > 0 ? dados[0].hub : "LMG-21 Muriaé";
     }
 
-    // --- INÍCIO DA PRÉ-GERAÇÃO ---
-    if (dados.length > 0) {
-      gerarBlobExcel()
-        .then(function (blob) {
-          var hubLimpo = dados[0].hub
-            ? dados[0].hub.replace(/\s+/g, "_")
-            : "LMG-21";
-          var filename = "RELATORIO_REPORTE_BASE_" + hubLimpo + ".xlsx";
-          arquivoExcelPronto = { blob: blob, filename: filename };
-        })
-        .catch(function (err) {
-          console.error("Erro na pré-geração do Excel:", err);
-          arquivoExcelPronto = null;
-        });
-    } else {
-      arquivoExcelPronto = null;
-    }
-    // --- FIM DA PRÉ-GERAÇÃO ---
+
   }
 
   function gerarBlobExcel() {
@@ -343,8 +349,10 @@
       "SUPERVISOR/COORDENADOR",
       "ENCARREGADO",
       "HUB",
+      "ROTAS HUB OFERTADOS",
       "ENTREGADOR",
       "REGIÃO/ BAIRRO",
+      "AT/CAFs",
       "AM/PM",
       "HORÁRIO INCIADO",
       "CARROS OFERTADOS",
@@ -353,8 +361,8 @@
       "NO SHOW",
     ];
     var colLarguras = [
-      15.74, 26.36, 13.99, 14.8, 40.63, 25.96, 9.68, 21.39, 18.7, 18.16, 14.26,
-      10.76,
+      15.74, 26.36, 13.99, 14.8, 18.7, 40.63, 25.96, 18.7, 9.68, 21.39, 18.7,
+      18.16, 14.26, 10.76,
     ];
 
     function paraValorData(str) {
@@ -430,22 +438,24 @@
       row.getCell(2).value = (item.supervisor || "").toUpperCase();
       row.getCell(3).value = (item.encarregado || "").toUpperCase();
       row.getCell(4).value = (item.hub || "").toUpperCase();
-      row.getCell(5).value = (item.entregador || "").toUpperCase();
-      row.getCell(6).value = (item.regiao || "").toUpperCase();
-      row.getCell(7).value = (item.turno || "").toUpperCase();
+      row.getCell(5).value = item.rotasHubOfertados;
+      row.getCell(6).value = (item.entregador || "").toUpperCase();
+      row.getCell(7).value = (item.regiao || "").toUpperCase();
+      row.getCell(8).value = (item.atCafs || "").toUpperCase();
+      row.getCell(9).value = (item.turno || "").toUpperCase();
 
       var hp = (item.horario || "00:00").split(":");
       var h = parseInt(hp[0], 10) || 0;
       var m = parseInt(hp[1], 10) || 0;
-      row.getCell(8).value =
+      row.getCell(10).value =
         (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
 
-      row.getCell(9).value = item.carrosOfertados;
-      row.getCell(10).value = item.carrosRetirados;
-      row.getCell(11).value = item.pctExpedidos;
-      row.getCell(12).value = item.noShow;
+      row.getCell(11).value = item.carrosOfertados;
+      row.getCell(12).value = item.carrosRetirados;
+      row.getCell(13).value = item.pctExpedidos;
+      row.getCell(14).value = item.noShow;
 
-      for (var col = 1; col <= 12; col++) {
+      for (var col = 1; col <= 14; col++) {
         row.getCell(col).style = estiloDado();
       }
       row.getCell(1).numFmt = "mm-dd-yy";
@@ -494,80 +504,13 @@
       });
   }
 
-  function compartilharExcel() {
-    if (dados.length === 0) {
-      alert("Nenhum registro para exportar.");
-      return;
-    }
-
-    var btn = dom.btnCompartilhar;
-    btn.disabled = true;
-    btn.textContent = "PREPARANDO...";
-
-    // CORREÇÃO DA CAUSA 2: Se o arquivo não estiver pronto, geramos na hora!
-    var promiseArquivo = arquivoExcelPronto
-      ? Promise.resolve(arquivoExcelPronto)
-      : gerarBlobExcel().then(function (blob) {
-          var hubLimpo = dados[0].hub ? dados[0].hub.replace(/\s+/g, "_") : "LMG-21";
-          var filename = "RELATORIO_REPORTE_BASE_" + hubLimpo + ".xlsx";
-          return { blob: blob, filename: filename };
-        });
-
-    promiseArquivo
-      .then(function (arquivo) {
-        
-        // CORREÇÃO DA CAUSA 3: Truque do MIME Type genérico
-        // Muitos celulares bloqueiam o tipo Excel longo, mas aceitam o octet-stream
-        var file = new File([arquivo.blob], arquivo.filename, {
-          type: "application/octet-stream", 
-        });
-
-        var podeCompartilhar = navigator.canShare
-          ? navigator.canShare({ files: [file] })
-          : false;
-
-        if (navigator.share && podeCompartilhar) {
-          btn.textContent = "COMPARTILHANDO...";
-          
-          navigator
-            .share({
-              files: [file],
-              title: arquivo.filename,
-              text: "Segue o relatório operacional.",
-            })
-            .then(function () {
-              console.log("Compartilhado com sucesso");
-            })
-            .catch(function (error) {
-              // Se o usuário cancelar, não faz nada. Se der erro, baixa.
-              if (error.name !== "AbortError") {
-                baixarBlob(arquivo.blob, arquivo.filename);
-              }
-            })
-            .finally(function () {
-              btn.textContent = "COMPARTILHAR EXCEL";
-              btn.disabled = false;
-            });
-        } else {
-          // Fallback: Navegador realmente não suporta compartilhar arquivos
-          alert("Seu navegador não suporta compartilhar este arquivo diretamente. O arquivo será baixado para que você possa enviá-lo pelo WhatsApp manualmente.");
-          baixarBlob(arquivo.blob, arquivo.filename);
-          btn.textContent = "COMPARTILHAR EXCEL";
-          btn.disabled = false;
-        }
-      })
-      .catch(function (err) {
-        console.error("Erro ao gerar arquivo para compartilhar:", err);
-        alert("Erro ao preparar o arquivo.");
-        btn.textContent = "COMPARTILHAR EXCEL";
-        btn.disabled = false;
-      });
-  }
 
   function limparCampos() {
     if (inputs.entregador) inputs.entregador.value = "";
     if (inputs.regiao) inputs.regiao.value = "";
+    if (inputs.atCafs) inputs.atCafs.value = "";
     if (inputs.horario) inputs.horario.value = "";
+    if (inputs.rotasHubOfertados) inputs.rotasHubOfertados.value = "0";
     if (inputs.carrosOfertados) inputs.carrosOfertados.value = "0";
     if (inputs.carrosRetirados) inputs.carrosRetirados.value = "0";
     if (inputs.pctExpedidos) inputs.pctExpedidos.value = "0";
@@ -657,23 +600,10 @@
       }
     }
 
-    if (dom.btnExportPDF) {
-      dom.btnExportPDF.addEventListener("click", function () {
-        if (dados.length === 0) {
-          alert("Nenhum registro para exportar.");
-          return;
-        }
-        window.print();
-      });
-    }
-
     if (dom.btnExportExcel) {
       dom.btnExportExcel.addEventListener("click", exportarExcel);
     }
 
-    if (dom.btnCompartilhar) {
-      dom.btnCompartilhar.addEventListener("click", compartilharExcel);
-    }
 
     if (inputs.hub && dom.hubDisplay) {
       inputs.hub.addEventListener("input", function () {
