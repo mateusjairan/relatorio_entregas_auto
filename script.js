@@ -114,7 +114,7 @@
       data: inputs.data ? inputs.data.value : "",
       supervisor: inputs.supervisor ? inputs.supervisor.value.trim() : "",
       encarregado: inputs.encarregado ? inputs.encarregado.value.trim() : "",
-      hub: inputs.hub ? inputs.hub.value.trim() : "",
+      hub: inputs.hub ? inputs.hub.value.trim().toUpperCase() : "",
       rotasHubOfertados: inputs.rotasHubOfertados
         ? toNumber(inputs.rotasHubOfertados.value)
         : 0,
