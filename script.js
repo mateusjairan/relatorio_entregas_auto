@@ -114,11 +114,6 @@
     if (!d.regiao) return "Informe a região/bairro.";
     if (!d.atCafs) return "Informe o AT/CAFs.";
     if (!d.horario) return "Informe o horário.";
-    if (!d.rotasHubOfertados || d.rotasHubOfertados < 1) return "Informe as rotas hub ofertados.";
-    if (!d.carrosOfertados || d.carrosOfertados < 1) return "Informe os carros ofertados.";
-    if (!d.carrosRetirados || d.carrosRetirados < 1) return "Informe os carros retirados.";
-    if (!d.pctExpedidos || d.pctExpedidos < 1) return "Informe os pct expedidos.";
-    if (!d.noShow || d.noShow < 1) return "Informe o no show.";
     return null;
   }
 

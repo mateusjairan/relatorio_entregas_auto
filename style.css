@@ -101,7 +101,6 @@ body {
     background: #fff;
 }
 
-.field input:invalid,
 .field select:invalid {
     border-color: #dc3545;
 }

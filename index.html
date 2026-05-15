@@ -21,7 +21,7 @@
 
             <section class="card form-card">
                 <h2>Relatório de Bordo Diário</h2>
-                <form id="formEntrega" autocomplete="off">
+                <form id="formEntrega" autocomplete="off" novalidate>
                     <div class="form-grid">
                         <div class="field">
                             <label for="data">DATA</label>
@@ -115,39 +115,33 @@
                             <input
                                 type="number"
                                 id="rotasHubOfertados"
-                                min="1"
+                                min="0"
                                 value="0"
-                                required
-                                oninvalid="this.setCustomValidity('Preencha esse campo')"
-                                oninput="this.setCustomValidity('')"
+                                onblur="if(this.value==='')this.value='0'"
                             />
                         </div>
                         <div class="field">
                             <label for="carrosOfertados"
-                                >CARROS OFERTADOS</label
+                                >CARRO OFERTADO</label
                             >
                             <input
                                 type="number"
                                 id="carrosOfertados"
-                                min="1"
+                                min="0"
                                 value="0"
-                                required
-                                oninvalid="this.setCustomValidity('Preencha esse campo')"
-                                oninput="this.setCustomValidity('')"
+                                onblur="if(this.value==='')this.value='0'"
                             />
                         </div>
                         <div class="field">
                             <label for="carrosRetirados"
-                                >CARROS RETIRADOS</label
+                                >CARRO RETIRADO</label
                             >
                             <input
                                 type="number"
                                 id="carrosRetirados"
-                                min="1"
+                                min="0"
                                 value="0"
-                                required
-                                oninvalid="this.setCustomValidity('Preencha esse campo')"
-                                oninput="this.setCustomValidity('')"
+                                onblur="if(this.value==='')this.value='0'"
                             />
                         </div>
                         <div class="field">
@@ -155,11 +149,9 @@
                             <input
                                 type="number"
                                 id="pctExpedidos"
-                                min="1"
+                                min="0"
                                 value="0"
-                                required
-                                oninvalid="this.setCustomValidity('Preencha esse campo')"
-                                oninput="this.setCustomValidity('')"
+                                onblur="if(this.value==='')this.value='0'"
                             />
                         </div>
                         <div class="field">
@@ -167,11 +159,9 @@
                             <input
                                 type="number"
                                 id="noShow"
-                                min="1"
+                                min="0"
                                 value="0"
-                                required
-                                oninvalid="this.setCustomValidity('Preencha esse campo')"
-                                oninput="this.setCustomValidity('')"
+                                onblur="if(this.value==='')this.value='0'"
                             />
                         </div>
                     </div>
