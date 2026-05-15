@@ -55,6 +55,13 @@
       var raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         dados = JSON.parse(raw);
+        for (var i = 0; i < dados.length; i++) {
+          dados[i].rotasHubOfertados = toNumber(dados[i].rotasHubOfertados);
+          dados[i].carrosOfertados = toNumber(dados[i].carrosOfertados);
+          dados[i].carrosRetirados = toNumber(dados[i].carrosRetirados);
+          dados[i].pctExpedidos = toNumber(dados[i].pctExpedidos);
+          dados[i].noShow = toNumber(dados[i].noShow);
+        }
       }
     } catch (_) {
       dados = [];
@@ -115,7 +122,7 @@
       data: inputs.data ? inputs.data.value : "",
       supervisor: inputs.supervisor ? inputs.supervisor.value.trim() : "",
       encarregado: inputs.encarregado ? inputs.encarregado.value.trim() : "",
-      hub: inputs.hub ? inputs.hub.value.trim() : "",
+      hub: inputs.hub ? inputs.hub.value.trim().toUpperCase() : "",
       rotasHubOfertados: inputs.rotasHubOfertados
         ? toNumber(inputs.rotasHubOfertados.value)
         : 0,
