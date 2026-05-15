@@ -86,11 +86,11 @@
   function setDefaults() {
     if (inputs.data) inputs.data.value = hoje();
     if (inputs.turno) inputs.turno.value = "AM";
-    if (inputs.rotasHubOfertados) inputs.rotasHubOfertados.value = "";
-    if (inputs.carrosOfertados) inputs.carrosOfertados.value = "";
-    if (inputs.carrosRetirados) inputs.carrosRetirados.value = "";
-    if (inputs.pctExpedidos) inputs.pctExpedidos.value = "";
-    if (inputs.noShow) inputs.noShow.value = "";
+    if (inputs.rotasHubOfertados) inputs.rotasHubOfertados.value = "0";
+    if (inputs.carrosOfertados) inputs.carrosOfertados.value = "0";
+    if (inputs.carrosRetirados) inputs.carrosRetirados.value = "0";
+    if (inputs.pctExpedidos) inputs.pctExpedidos.value = "0";
+    if (inputs.noShow) inputs.noShow.value = "0";
   }
 
   function formatDate(bruta) {
@@ -535,11 +535,11 @@
     if (inputs.regiao) inputs.regiao.value = "";
     if (inputs.atCafs) inputs.atCafs.value = "";
     if (inputs.horario) inputs.horario.value = "";
-    if (inputs.rotasHubOfertados) inputs.rotasHubOfertados.value = "";
-    if (inputs.carrosOfertados) inputs.carrosOfertados.value = "";
-    if (inputs.carrosRetirados) inputs.carrosRetirados.value = "";
-    if (inputs.pctExpedidos) inputs.pctExpedidos.value = "";
-    if (inputs.noShow) inputs.noShow.value = "";
+    if (inputs.rotasHubOfertados) inputs.rotasHubOfertados.value = "0";
+    if (inputs.carrosOfertados) inputs.carrosOfertados.value = "0";
+    if (inputs.carrosRetirados) inputs.carrosRetirados.value = "0";
+    if (inputs.pctExpedidos) inputs.pctExpedidos.value = "0";
+    if (inputs.noShow) inputs.noShow.value = "0";
     if (inputs.turno) inputs.turno.value = "AM";
     if (inputs.entregador) inputs.entregador.focus();
   }
