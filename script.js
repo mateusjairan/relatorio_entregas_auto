@@ -542,11 +542,6 @@
   function handleFormSubmit(e) {
     e.preventDefault();
     var d = getFormData();
-    var erro = validarForm(d);
-    if (erro) {
-      alert(erro);
-      return;
-    }
     adicionarRegistro(d);
     limparCampos();
   }
