@@ -101,6 +101,11 @@ body {
     background: #fff;
 }
 
+.field input:invalid:not(:placeholder-shown),
+.field select:invalid {
+    border-color: #dc3545;
+}
+
 .form-actions {
     display: flex;
     gap: 12px;

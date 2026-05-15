@@ -25,7 +25,7 @@
                     <div class="form-grid">
                         <div class="field">
                             <label for="data">DATA</label>
-                            <input type="date" id="data" required />
+                            <input type="date" id="data" required oninvalid="this.setCustomValidity('Preencha esse campo')" oninput="this.setCustomValidity('')" />
                         </div>
                         <div class="field">
                             <label for="supervisor"
@@ -36,6 +36,8 @@
                                 id="supervisor"
                                 placeholder="Ex: Cinthya"
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
                         <div class="field">
@@ -45,6 +47,8 @@
                                 id="encarregado"
                                 placeholder="Ex: Mateus Reis"
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
                         <div class="field">
@@ -55,6 +59,8 @@
                                 placeholder="Ex: LMG-21 Muriaé"
                                 value=""
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
 
@@ -65,6 +71,8 @@
                                 id="entregador"
                                 placeholder="Nome do entregador"
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
                         <div class="field">
@@ -74,6 +82,8 @@
                                 id="regiao"
                                 placeholder="Ex: Pedra Dourada"
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
                         <div class="field">
@@ -83,18 +93,20 @@
                                 id="atCafs"
                                 placeholder="Ex: AT-12345 / CAF-67890"
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
                         <div class="field">
                             <label for="turno">AM/PM </label>
-                            <select id="turno" required>
+                            <select id="turno" required oninvalid="this.setCustomValidity('Preencha esse campo')" oninput="this.setCustomValidity('')">
                                 <option value="AM">AM</option>
                                 <option value="PM">PM</option>
                             </select>
                         </div>
                         <div class="field">
                             <label for="horario">HORÁRIO INCIADO</label>
-                            <input type="time" id="horario" required />
+                            <input type="time" id="horario" required oninvalid="this.setCustomValidity('Preencha esse campo')" oninput="this.setCustomValidity('')" />
                         </div>
                         <div class="field">
                             <label for="rotasHubOfertados"
@@ -103,9 +115,11 @@
                             <input
                                 type="number"
                                 id="rotasHubOfertados"
-                                min="0"
-                                value="0"
+                                min="1"
+                                value=""
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
                         <div class="field">
@@ -115,9 +129,11 @@
                             <input
                                 type="number"
                                 id="carrosOfertados"
-                                min="0"
-                                value="0"
+                                min="1"
+                                value=""
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
                         <div class="field">
@@ -127,9 +143,11 @@
                             <input
                                 type="number"
                                 id="carrosRetirados"
-                                min="0"
-                                value="0"
+                                min="1"
+                                value=""
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
                         <div class="field">
@@ -137,9 +155,11 @@
                             <input
                                 type="number"
                                 id="pctExpedidos"
-                                min="0"
-                                value="0"
+                                min="1"
+                                value=""
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
                         <div class="field">
@@ -147,9 +167,11 @@
                             <input
                                 type="number"
                                 id="noShow"
-                                min="0"
-                                value="0"
+                                min="1"
+                                value=""
                                 required
+                                oninvalid="this.setCustomValidity('Preencha esse campo')"
+                                oninput="this.setCustomValidity('')"
                             />
                         </div>
                     </div>

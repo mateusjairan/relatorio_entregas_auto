@@ -86,11 +86,11 @@
   function setDefaults() {
     if (inputs.data) inputs.data.value = hoje();
     if (inputs.turno) inputs.turno.value = "AM";
-    if (inputs.rotasHubOfertados) inputs.rotasHubOfertados.value = "0";
-    if (inputs.carrosOfertados) inputs.carrosOfertados.value = "0";
-    if (inputs.carrosRetirados) inputs.carrosRetirados.value = "0";
-    if (inputs.pctExpedidos) inputs.pctExpedidos.value = "0";
-    if (inputs.noShow) inputs.noShow.value = "0";
+    if (inputs.rotasHubOfertados) inputs.rotasHubOfertados.value = "";
+    if (inputs.carrosOfertados) inputs.carrosOfertados.value = "";
+    if (inputs.carrosRetirados) inputs.carrosRetirados.value = "";
+    if (inputs.pctExpedidos) inputs.pctExpedidos.value = "";
+    if (inputs.noShow) inputs.noShow.value = "";
   }
 
   function formatDate(bruta) {
@@ -114,6 +114,11 @@
     if (!d.regiao) return "Informe a região/bairro.";
     if (!d.atCafs) return "Informe o AT/CAFs.";
     if (!d.horario) return "Informe o horário.";
+    if (!d.rotasHubOfertados || d.rotasHubOfertados < 1) return "Informe as rotas hub ofertados.";
+    if (!d.carrosOfertados || d.carrosOfertados < 1) return "Informe os carros ofertados.";
+    if (!d.carrosRetirados || d.carrosRetirados < 1) return "Informe os carros retirados.";
+    if (!d.pctExpedidos || d.pctExpedidos < 1) return "Informe os pct expedidos.";
+    if (!d.noShow || d.noShow < 1) return "Informe o no show.";
     return null;
   }
 
@@ -530,11 +535,11 @@
     if (inputs.regiao) inputs.regiao.value = "";
     if (inputs.atCafs) inputs.atCafs.value = "";
     if (inputs.horario) inputs.horario.value = "";
-    if (inputs.rotasHubOfertados) inputs.rotasHubOfertados.value = "0";
-    if (inputs.carrosOfertados) inputs.carrosOfertados.value = "0";
-    if (inputs.carrosRetirados) inputs.carrosRetirados.value = "0";
-    if (inputs.pctExpedidos) inputs.pctExpedidos.value = "0";
-    if (inputs.noShow) inputs.noShow.value = "0";
+    if (inputs.rotasHubOfertados) inputs.rotasHubOfertados.value = "";
+    if (inputs.carrosOfertados) inputs.carrosOfertados.value = "";
+    if (inputs.carrosRetirados) inputs.carrosRetirados.value = "";
+    if (inputs.pctExpedidos) inputs.pctExpedidos.value = "";
+    if (inputs.noShow) inputs.noShow.value = "";
     if (inputs.turno) inputs.turno.value = "AM";
     if (inputs.entregador) inputs.entregador.focus();
   }
