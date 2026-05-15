@@ -105,6 +105,7 @@
     if (!d.hub) return "Informe o HUB.";
     if (!d.entregador) return "Informe o entregador.";
     if (!d.regiao) return "Informe a região/bairro.";
+    if (!d.atCafs) return "Informe o AT/CAFs.";
     if (!d.horario) return "Informe o horário.";
     return null;
   }
@@ -561,6 +562,12 @@
       !inputs.hub ||
       !inputs.entregador ||
       !inputs.regiao ||
+      !inputs.atCafs ||
+      !inputs.rotasHubOfertados ||
+      !inputs.carrosOfertados ||
+      !inputs.carrosRetirados ||
+      !inputs.pctExpedidos ||
+      !inputs.noShow ||
       !inputs.turno ||
       !inputs.horario
     ) {
